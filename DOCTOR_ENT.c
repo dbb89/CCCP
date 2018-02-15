@@ -183,9 +183,12 @@ int main(int ac, char** av)
 
 	int i,j;
 
+	//Read twice to look at the second window of random information
+	fread(bite, sizeof(bite), steps, fin);
+	fread(bite, sizeof(bite), steps, fin);
+
 	for(i = 0; i < steps; i++)
 	{
-		fread(bite, sizeof(bite), 1, fin);
 
 		for(j = 0; j < 4; j++)
 		{
