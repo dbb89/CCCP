@@ -10,7 +10,9 @@ The mission of this project is to illustrate how truely random information
 can be used to:
 
 > Secure entire servers' communications with a single true random ledger.
+
 > Generate 2D graphics and 3D models via geometric algorithms.
+
 > Aid in creating games and game servers that are truely fair to all players.
 
 The philosophy being that if random information is going to be used at some
@@ -69,8 +71,6 @@ Additional C files using this technique are welcome in the directory
 The 'Circle_One.svg' file is included as the barebones SVG file with a
 10px circle in the centre used to find dimensions necessary for geometric
 calculations, as well as the necessary semantics for 'DOCTOR_ENT.c' to output.
-The dimensions are what they are so that this graphic can be printed onto my
-business card.
 
 'EXAMPLE.svg' is the output of 'DOCTOR_ENT.c', Please study these files
 together and contribute your own consciously chaotic creations in the

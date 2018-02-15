@@ -27,10 +27,10 @@ static bool even = true;
 static float xy[] = {0.0, 0.0};
 
 //Starting Positions
-static float north[] = {250, 150};
-static float south[] = {250, 150};
-static float east[]  = {250, 150};
-static float west[]  = {250, 150};
+static float north[] = {350, 350};
+static float south[] = {350, 350};
+static float east[]  = {350, 350};
+static float west[]  = {350, 350};
 
 //Track Last Colour (1=red, 2=yellow, 3=green, 4=purple, 0=none)
 static int last_north = 0;
@@ -175,7 +175,7 @@ static void add_purple(int step, int dir)
 //Reads from RandomNumbers :: 00=Red, 01=Yellow, 10=Green, 11=Purple
 int main(int ac, char** av)
 {
-	unsigned char bite[1];
+	unsigned char bite[steps];
 	static unsigned char mask[] = {128, 64, 32, 16, 8, 4, 2, 1};
 
 	fin = fopen("RandomNumbers", "rb"); //read binary
@@ -189,15 +189,15 @@ int main(int ac, char** av)
 
 		for(j = 0; j < 4; j++)
 		{
-			if (bite[0] & mask[j])
+			if (bite[i] & mask[j*2])
 			{
-				if (bite[0] & mask[j+1])
+				if (bite[i] & mask[j*2+1])
 					add_purple(i, j);
 				else
 					add_green(i, j);
 			} else
 			{
-				if (bite[0] & mask[j+1])
+				if (bite[i] & mask[j*2+1])
 					add_yellow(i, j);
 				else
 					add_red(i, j);
