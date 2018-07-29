@@ -21,8 +21,8 @@ FILE *fin; //Input:  RandomNumbers
 FILE *fot; //Output: EXAMPLE.svg
 
 //Helper Variables
-static int steps = 24;
-static float ratio = 1.272;
+static int steps = 64;
+static float ratio = 1.13;
 static bool even = true;
 static float xy[] = {0.0, 0.0};
 
@@ -55,46 +55,57 @@ static bool colour_safe(int colour, int dir)
 		return true;
 }
 
+//Used to increase the ratio exponentially
+static float power(float rat, int step)
+{
+	int i = 0;
+	float result = rat;
+	for(; i < step; i++)
+		result *= rat;
+
+	return result;
+}
+
 //Set x and y variables depending on direction. Some ifs for graphic style.
 static void set_xy(int step, int dir)
 {
 	if (dir == 0)
 	{
 		if (even)
-			north[0] += step*ratio;
+			north[0] += power(ratio, step);
 		else
-			north[0] -= step*ratio;
-		north[1] -= step*ratio;
+			north[0] -= power(ratio, step);
+		north[1] -= power(ratio, step);
 		xy[0] = north[0];
 		xy[1] = north[1];
 
 	} else if (dir == 1)
 	{
 		if (even)
-			south[0] -= step*ratio;
+			south[0] -= power(ratio, step);
 		else
-			south[0] += step*ratio;
-		south[1] += step*ratio;
+			south[0] += power(ratio, step);
+		south[1] += power(ratio, step);
 		xy[0] = south[0];
 		xy[1] = south[1];
 
 	} else if (dir == 2)
 	{
 		if (even)
-			east[1] += step*ratio;
+			east[1] += power(ratio, step);
 		else
-			east[1] -= step*ratio;
-		east[0] += step*ratio;
+			east[1] -= power(ratio, step);
+		east[0] += power(ratio, step);
 		xy[0] = east[0];
 		xy[1] = east[1];
 
 	} else
 	{
 		if (even)
-			west[1] -= step*ratio;
+			west[1] -= power(ratio, step);
 		else
-			west[1] += step*ratio;
-		west[0] -= step*ratio;
+			west[1] += power(ratio, step);
+		west[0] -= power(ratio, step);
 		xy[0] = west[0];
 		xy[1] = west[1];
 
@@ -126,7 +137,7 @@ static void add_red(int step, int dir)
 	else {
 		set_xy(step, dir);
 		fprintf(fot, "<circle fill=\"#DD0000\" cx=\"%.3f\" cy=\"%.3f\" r=\"%.3f\"/>\n", 
-															xy[0], xy[1], step*ratio);
+															xy[0], xy[1], power(ratio, step));
 		set_last(1, dir);
 	}
 }
@@ -139,7 +150,7 @@ static void add_yellow(int step, int dir)
 	else {
 		set_xy(step, dir);
 		fprintf(fot, "<circle fill=\"#DDDD00\" cx=\"%.3f\" cy=\"%.3f\" r=\"%.3f\"/>\n", 
-															xy[0], xy[1], step*ratio);
+															xy[0], xy[1], power(ratio, step));
 		set_last(2, dir);
 	}
 }
@@ -152,7 +163,7 @@ static void add_green(int step, int dir)
 	else {
 		set_xy(step, dir);
 		fprintf(fot, "<circle fill=\"#00DD00\" cx=\"%.3f\" cy=\"%.3f\" r=\"%.3f\"/>\n", 
-															xy[0], xy[1], step*ratio);
+															xy[0], xy[1], power(ratio, step));
 		set_last(3, dir);
 	}
 }
@@ -165,7 +176,7 @@ static void add_purple(int step, int dir)
 	else {
 		set_xy(step, dir);
 		fprintf(fot, "<circle fill=\"#AA00AA\" cx=\"%.3f\" cy=\"%.3f\" r=\"%.3f\"/>\n", 
-															xy[0], xy[1], step*ratio);
+															xy[0], xy[1], power(ratio, step));
 		set_last(4, dir);
 	}
 }
@@ -175,21 +186,28 @@ static void add_purple(int step, int dir)
 //Reads from RandomNumbers :: 00=Red, 01=Yellow, 10=Green, 11=Purple
 int main(int ac, char** av)
 {
-	unsigned char bite[steps];
 	static unsigned char mask[] = {128, 64, 32, 16, 8, 4, 2, 1};
 
 	fin = fopen("RandomNumbers", "rb"); //read binary
 	fot = fopen("EXAMPLE.svg", "w");	//write
 
-	int i,j;
+	//Print SVG Header
+	fprintf(fot, "<?xml version=\"1.0\" encoding=\"utf-8\"?>\n");
+	fprintf(fot, "<!DOCTYPE svg PUBLIC \"-//W3C//DTD SVG 1.1//EN\" \"http://www.w3.org/Graphics/SVG/1.1/DTD/svg11.dtd\">\n");
+	fprintf(fot, "<svg version=\"1.1\" id=\"Your_Design\" xmlns=\"http://www.w3.org/2000/svg\" xmlns:xlink=\"http://www.w3.org/1999/xlink\" x=\"0px\"\n");
+	fprintf(fot, "y=\"0px\" width=\"700\" height=\"700\" viewBox=\"0 0 700 700\" enable-background=\"new 0 0 700 700\" xml:space=\"preserve\">\n");
+	fprintf(fot, "<rect fill=\"#000000\" width=\"700\" height=\"700\"/>\n");
 
-	//Read twice to look at the second window of random information
-	fread(bite, sizeof(bite), steps, fin);
-	fread(bite, sizeof(bite), steps, fin);
+	char *bite = malloc(steps + 1);
+	fread(bite, 1, steps, fin);
+	fread(bite, 1, steps, fin); //Read twice to see second window of
+	fclose(fin);				//random information.
+	bite[steps] = 0;
+
+	int i,j;
 
 	for(i = 0; i < steps; i++)
 	{
-
 		for(j = 0; j < 4; j++)
 		{
 			if (bite[i] & mask[j*2])
@@ -209,6 +227,8 @@ int main(int ac, char** av)
 
 		even = (i%2 == 0);
 	}
+
+	fprintf(fot, "</svg>");
 
 	return 0;
 }
